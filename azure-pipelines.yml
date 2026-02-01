@@ -1,0 +1,47 @@
+pool: new_app_agent
+
+trigger: none
+
+# stages:stage
+stages:
+- stage: terraforminit 
+  displayName: terraform init
+  pool: new_app_agent
+
+  # jobs:job
+jobs:
+- job: terrafrminit
+  displayName: terraform init 
+# steps:task
+steps:  
+- task: TerraformTask@5
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/.'
+    backendServiceArm: 'new_app_srv_connection'
+    backendAzureRmOverrideSubscriptionID: 'ca2d764d-6af0-4ecc-8eaf-76bd3b666806'
+    backendAzureRmResourceGroupName: 'rg_pks'
+    backendAzureRmStorageAccountName: 'pundeostg'
+    backendAzureRmContainerName: 'pkcontainer'
+    backendAzureRmKey: 'terraform.tfstate'''
+
+
+# trigger:
+# - main
+
+# pool: 
+#   vmImage: ubuntu-latest
+
+# stages:
+# - stage: CI
+#   jobs:
+#   - job: CIWork
+#     steps:
+#     - script: "Do CI work"
+
+# - stage: Test
+#   jobs:
+#   - job: TestWork
+#     steps:
+#     - script: "Do test work"
