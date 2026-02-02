@@ -6,7 +6,7 @@ trigger: none
 stages:
 - stage: terraforminit 
   displayName: terraform init
-  pool: new_app_agent
+  pool: new_agent_pool
 
   # jobs:job
   jobs:
