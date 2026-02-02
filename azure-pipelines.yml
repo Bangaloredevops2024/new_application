@@ -18,7 +18,7 @@ stages:
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/.'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
         backendServiceArm: 'new_app_srv_connection'
         backendAzureRmStorageAccountName: 'pundeostg'
         backendAzureRmContainerName: 'pkcontainer'
