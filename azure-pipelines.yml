@@ -23,6 +23,7 @@ stages:
         backendAzureRmStorageAccountName: 'pundeostg'
         backendAzureRmContainerName: 'pkcontainer'
         backendAzureRmKey: 'terraform.tfstate'
+        
 - stage: terraformplan
   displayName: terraform plan
   pool: new_agent_pool
@@ -30,6 +31,16 @@ stages:
   jobs:
     - job: terraformplan
       steps:
+      - task: TerraformTask@5
+        displayName: terraform init for plan stage
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          backendServiceArm: 'new_app_srv_connection'
+          backendAzureRmStorageAccountName: 'pundeostg'
+          backendAzureRmContainerName: 'pkcontainer'
+          backendAzureRmKey: 'terraform.tfstate'
       - task: TerraformTask@5
         inputs:
           provider: 'azurerm'
