@@ -25,6 +25,7 @@ stages:
         backendAzureRmKey: 'terraform.tfstate'
 - stage: terraformplan
   displayName: terraform plan
+  pool: new_agent_pool
 
   jobs:
     - job: terraformplan
