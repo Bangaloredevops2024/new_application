@@ -1,4 +1,4 @@
-pool: new_app_agent
+pool: new_agent_pool
 
 trigger: none
 
@@ -23,11 +23,31 @@ stages:
         backendAzureRmStorageAccountName: 'pundeostg'
         backendAzureRmContainerName: 'pkcontainer'
         backendAzureRmKey: 'terraform.tfstate'
-    - task: TerraformTask@5
-      inputs:
-        provider: 'azurerm'
-        command: 'plan'
-        environmentServiceNameAzureRM: 'new_app_srv_connection'
+- stage: terraformplan
+  displayName: terraform plan
+
+  jobs:
+    - job: terraformplan
+      steps:
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          environmentServiceNameAzureRM: 'new_app_srv_connection'
+        
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
