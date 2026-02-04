@@ -10,7 +10,7 @@ stages:
 
   # jobs:job
   jobs:
-  - job: terrafrmvalidate
+  - job: terraformvalidate
     displayName: validation of infra code
     # steps:task
     steps:
