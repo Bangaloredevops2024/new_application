@@ -1,0 +1,105 @@
+pool: new_agent_pool
+
+trigger: none
+
+# stages:stage
+stages:
+- stage: terraformvalidate 
+  displayName: validate of terraform code
+  pool: new_agent_pool
+
+  # jobs:job
+  jobs:
+  - job: terraformvalidate
+    displayName: validation of infra code
+    # steps:task
+    steps:
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        backendServiceArm: 'new_app_srv_connection'
+        backendAzureRmStorageAccountName: 'pundeostg'
+        backendAzureRmContainerName: 'pkcontainer'
+        backendAzureRmKey: 'terraform.tfstate'
+
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+
+  - job: terraformfmt
+    dependsOn: terraformvalidate
+    displayName: terraform fmt
+    steps: 
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'custom'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        outputTo: 'console'
+        customCommand: 'fmt'
+        environmentServiceNameAzureRM: 'new_app_srv_connection'
+    
+
+
+- stage: terraformplan
+  displayName: terraform plan
+  pool: new_agent_pool
+
+  jobs:
+    - job: terraformplan
+      steps:
+      - task: TerraformTask@5
+        displayName: terraform init for plan stage
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          backendServiceArm: 'new_app_srv_connection'
+          backendAzureRmStorageAccountName: 'pundeostg'
+          backendAzureRmContainerName: 'pkcontainer'
+          backendAzureRmKey: 'terraform.tfstate'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          environmentServiceNameAzureRM: 'new_app_srv_connection'
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# trigger:
+# - main
+
+# pool: 
+#   vmImage: ubuntu-latest
+
+# stages:
+# - stage: CI
+#   jobs:
+#   - job: CIWork
+#     steps:
+#     - script: "Do CI work"
+
+# - stage: Test
+#   jobs:
+#   - job: TestWork
+#     steps:
+#     - script: "Do test work"
