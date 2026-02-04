@@ -4,14 +4,14 @@ trigger: none
 
 # stages:stage
 stages:
-- stage: validate 
+- stage: terraformvalidate 
   displayName: validate of terraform code
   pool: new_agent_pool
 
   # jobs:job
   jobs:
-  - job: terrafrminit
-    displayName: terraform init 
+  - job: terrafrmvalidate
+    displayName: validation of infra code
     # steps:task
     steps:
     - task: TerraformTask@5
@@ -30,7 +30,21 @@ stages:
         command: 'validate'
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
 
-        
+  - job: terraformfmt
+    dependsOn: terraformvalidate
+    displayName: terraform fmt
+    steps: 
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'custom'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        outputTo: 'console'
+        customCommand: 'fmt'
+        environmentServiceNameAzureRM: 'new_app_srv_connection'
+    
+
+
 - stage: terraformplan
   displayName: terraform plan
   pool: new_agent_pool
