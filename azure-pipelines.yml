@@ -1,0 +1,166 @@
+pool: new_agent_pool
+
+trigger: none
+
+# stages:stage
+stages:
+- stage: terraformvalidate 
+  displayName: validate of terraform code
+  pool: new_agent_pool
+
+  # jobs:job
+  jobs:
+  - job: terraformvalidate
+    displayName: validation of infra code
+    # steps:task
+    steps:
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        backendServiceArm: 'new_app_srv_connection'
+        backendAzureRmStorageAccountName: 'pundeostg'
+        backendAzureRmContainerName: 'pkcontainer'
+        backendAzureRmKey: 'terraform.tfstate'
+
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+
+  - job: terraformfmt
+    dependsOn: terraformvalidate
+    displayName: terraform fmt
+    steps: 
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'custom'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        outputTo: 'console'
+        customCommand: 'fmt'
+        environmentServiceNameAzureRM: 'new_app_srv_connection'
+  - job: tfsec
+    dependsOn: terraformfmt
+    displayName: tfsec for securit scan
+    steps:
+    - task: tfsec@1
+      inputs:
+        version: 'v1.26.0'
+        debug: true
+        dir: '$(System.DefaultWorkingDirectory)/environment/dev'
+  - job: tflint
+    dependsOn: tfsec
+    displayName: code quality checker
+    steps:
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          tflint --init
+                  tflint
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+      
+- stage: infracoststage
+  dependsOn: terraformvalidate
+  displayName: Terraform infra ka estimated cost
+  pool: new_agent_pool
+  jobs:
+    - job: Terraforminfracost
+      steps:
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: 'infracost breakdown --path=.'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+
+        # infracost → cost analysis tool,breakdown → detailed cost show karo,--path=. → current folder ke Terraform code ko scan karo
+
+
+
+- stage: terraformplan
+  displayName: terraform plan
+  pool: new_agent_pool
+
+  jobs:
+    - job: terraformplan
+      steps:
+      - task: TerraformTask@5
+        displayName: terraform init for plan stage
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          backendServiceArm: 'new_app_srv_connection'
+          backendAzureRmStorageAccountName: 'pundeostg'
+          backendAzureRmContainerName: 'pkcontainer'
+          backendAzureRmKey: 'terraform.tfstate'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+          environmentServiceNameAzureRM: 'new_app_srv_connection'
+        
+- stage: Manualapproval
+  dependsOn: terraformplan
+  displayName: Approval/Validation & Governance Stage
+  pool: server
+  jobs:
+    - job: ManualValidation
+      steps:
+      - task: ManualValidation@1
+        inputs:
+          notifyUsers: 'pundeo2912@gmail.com'
+          approvers: 'pundeo2912@gmail.com'
+          instructions: 'just say ok'
+
+
+- stage: terraformapply
+  dependsOn: Manualapproval
+  displayName: Terraform Apply
+  pool: new_agent_pool
+
+  jobs: 
+  - job: Terraformapply
+    steps:
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+        backendServiceArm: 'new_app_srv_connection'
+        backendAzureRmStorageAccountName: 'pundeostg'
+        backendAzureRmContainerName: 'pkcontainer'
+        backendAzureRmKey: 'terraform.tfstate'
+
+    - task: TerraformTask@5
+      inputs:
+       provider: 'azurerm'
+       command: 'apply'
+       workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
+       environmentServiceNameAzureRM: 'new_app_srv_connection'
+
+
+
+
+# trigger:
+# - main
+
+# pool: 
+#   vmImage: ubuntu-latest
+
+# stages:
+# - stage: CI
+#   jobs:
+#   - job: CIWork
+#     steps:
+#     - script: "Do CI work"
+
+# - stage: Test
+#   jobs:
+#   - job: TestWork
+#     steps:
+#     - script: "Do test work"
