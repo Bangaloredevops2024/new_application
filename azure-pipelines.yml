@@ -4,7 +4,7 @@ trigger: none
 
 # stages:stage
 stages:
-- stage: terraformvalidate 
+- stage: precommit 
   displayName: validate of terraform code
   pool: new_agent_pool
 
@@ -64,7 +64,7 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
       
 - stage: infracoststage
-  dependsOn: terraformvalidate
+  dependsOn: precommit
   displayName: Terraform infra ka estimated cost
   pool: new_agent_pool
   jobs:
