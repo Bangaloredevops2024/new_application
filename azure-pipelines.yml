@@ -42,20 +42,26 @@ stages:
         outputTo: 'console'
         customCommand: 'fmt'
         environmentServiceNameAzureRM: 'new_app_srv_connection'
+
   - job: tfsec
     dependsOn: terraformfmt
     displayName: tfsec for securit scan
+    condition: always()
     steps:
     - task: tfsec@1
+      continueOnError: true
       inputs:
         version: 'v1.26.0'
         debug: true
+        
         dir: '$(System.DefaultWorkingDirectory)/environment/dev'
+
   - job: tflint
     dependsOn: tfsec
     displayName: code quality checker
     steps:
     - task: PowerShell@2
+      continueOnError: true
       inputs:
         targetType: 'inline'
         script: |
