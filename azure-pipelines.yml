@@ -78,7 +78,7 @@ stages:
     - job: Terraforminfracost
       displayName: Infracost Analysis
       steps:
-        - task: Infracost@1
+        - task: Infracost@0
           displayName: Infracost Breakdown
           continueOnError: true
           inputs:
