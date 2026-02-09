@@ -70,71 +70,33 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
       
 
-- stage: infracoststage
-  dependsOn: precommit
-  displayName: Terraform infra ka estimated cost
-  pool: new_agent_pool
-  jobs:
-    - job: Terraforminfracost
-      displayName: Infracost Analysis
-      steps:
-        - task: Infracost@0
-          displayName: Infracost Breakdown
-          continueOnError: true
-          inputs:
-            path: '$(System.DefaultWorkingDirectory)/environment/dev'
-            format: table
-          env:
-            INFRACOST_API_KEY: $(INFRACOST_API_KEY)
-
-
-
 # - stage: infracoststage
 #   dependsOn: precommit
 #   displayName: Terraform infra ka estimated cost
 #   pool: new_agent_pool
 #   jobs:
-#   - job: Terraforminfracost
-#     displayName: Infracost Analysis
-#     steps:
-#     -  task: Infracost@0
-#       displayName: Infracost Breakdown
-#       continueOnError: true
-#       inputs:
-#         path: '$(System.DefaultWorkingDirectory)/environment/dev'
-#         format: table
-      
-#       env:
-#         INFRACOST_API_KEY: $(INFRACOST_API_KEY)
+#     - job: infracost
+#       displayName: Infracost Analysis
+#       steps:
+#         - task: Infracost@0
+#           displayName: Infracost Breakdown
+#           continueOnError: true
+#           inputs:
+#             path: '$(System.DefaultWorkingDirectory)/environment/dev'
+#             format: table
+#           env:
+#             INFRACOST_API_KEY: $(INFRACOST_API_KEY)
 
-     
 
         # infracost → cost analysis tool,breakdown → detailed cost show karo,--path=. → current folder ke Terraform code ko scan karo
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - stage: terraformplan
   displayName: terraform plan
   pool: new_agent_pool
 
   jobs:
     - job: terraformplan
+      condition: always()
       steps:
       - task: TerraformTask@5
         displayName: terraform init for plan stage
