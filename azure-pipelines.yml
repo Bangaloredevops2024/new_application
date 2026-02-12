@@ -154,6 +154,19 @@ stages:
        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev'
        environmentServiceNameAzureRM: 'new_app_srv_connection'
 
+- stage: terraformdestroy
+  pool: new_agent_pool
+
+  jobs:
+    - job: terraformdestroy
+      steps:
+      - task: TerraformTask@5
+        displayName: destroy all infra
+        inputs:
+          provider: 'azurerm'
+          command: 'destroy'
+          workingDirectory: '$(System.DefaultWorkingDirect/environment/dev'
+          environmentServiceNameAzureRM: 'new_app_srv_connection'
 
 
 
