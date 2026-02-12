@@ -159,6 +159,7 @@ stages:
 
   jobs:
     - job: terraformdestroy
+      condition: always()
       steps:
       - task: TerraformTask@5
         displayName: destroy all infra
