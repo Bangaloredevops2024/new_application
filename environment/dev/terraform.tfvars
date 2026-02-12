@@ -63,7 +63,7 @@ key_vault = {
 
 stg_account = {
   "stg_account_01" = {
-    name                = "stgbackend"
+    name                = "stgbackend1"
     location            = "centralindia"
     resource_group_name = "rg_dev"
     tags = {
@@ -76,7 +76,7 @@ mssql_name                   = "sqlserver-dev"
 resource_group_name          = "rg_dev"
 location                     = "centralindia"
 administrator_login          = "mssql_admin"
-administrator_login_password = "admin@12345"
+administrator_login_password = "Admin@12345"
 
 
 # mssql_db_name = "mssql_db-dev"
