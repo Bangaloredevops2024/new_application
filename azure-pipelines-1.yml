@@ -1,0 +1,21 @@
+trigger: 
+- main
+- feture
+pool: new_agent_pool
+
+stages:
+  - stage: preecommit
+    pool: new_agent_pool
+    jobs: 
+      - job: terraforminit
+        displayName: terraform init
+        steps:
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/environment\dev'
+            backendServiceArm: 'new_app_srv_connection'
+            backendAzureRmStorageAccountName: 'pundeostg'
+            backendAzureRmContainerName: 'pkcontainer'
+            backendAzureRmKey: 'terraform.tfstate'
