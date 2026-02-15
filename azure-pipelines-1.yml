@@ -19,3 +19,21 @@ stages:
             backendAzureRmStorageAccountName: 'pundeostg'
             backendAzureRmContainerName: 'pkcontainer'
             backendAzureRmKey: 'terraform.tfstate'
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/environment\dev'
+  - stage: terraformplan
+    jobs:
+      - job: terraformplan     
+        steps:
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/environment\dev'
+            backendServiceArm: 'new_app_srv_connection'
+            backendAzureRmStorageAccountName: 'pundeostg'
+            backendAzureRmContainerName: 'pkcontainer'
+            backendAzureRmKey: 'terraform.tfstate'
