@@ -1,12 +1,17 @@
 rgs = {
   "rg1" = {
-    rg_name       = "rg_dev"
+    rg_name       = "rg_dev1"
     location   = "central india"
     managed_by = "dev-terraform"
     tags = {
       environment = "dev"
     }
   }
+rg2 = {
+  rg_name = "rg_prod"
+  location = "centralindia"
+}
+
 }
 
 pips = {
